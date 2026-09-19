@@ -1,0 +1,9 @@
+/* src/App.module.css */
+
+/* Корневой контейнер приложения */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  min-height: 100vh;
+}
