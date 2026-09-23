@@ -1,0 +1,61 @@
+/* src/components/BalanceCard/BalanceCard.module.css */
+
+/* Контейнер карточки */
+.card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--color-primary);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Подпись карточки (например, "Доходы", "Расходы") */
+.title {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Сумма */
+.amount {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+/* Модификатор для доходов (зелёная полоса) */
+.income {
+  border-left-color: var(--color-income);
+}
+
+.income .amount {
+  color: var(--color-income);
+}
+
+/* Модификатор для расходов (красная полоса) */
+.expense {
+  border-left-color: var(--color-expense);
+}
+
+.expense .amount {
+  color: var(--color-expense);
+}
+
+/* Модификатор для баланса (синяя полоса) */
+.balance {
+  border-left-color: var(--color-balance);
+}
+
+.balance .amount {
+  color: var(--color-balance);
+}

@@ -1,0 +1,17 @@
+/* src/components/Layout/Layout.module.css */
+
+/* Основной контейнер layout */
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Контейнер для основного контента */
+.main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
