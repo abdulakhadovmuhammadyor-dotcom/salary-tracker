@@ -1,28 +1,22 @@
-// src/components/BalanceCard/BalanceCard.jsx
-import styles from './BalanceCard.module.css';
+import React from "react";
+import styles from "./BalanceCard.module.css";
 
-function BalanceCard({ title, amount, type = 'balance' }) {
-  // Fallback для amount: если не передано или null/undefined, показываем 0
-  const displayAmount = amount ?? 0;
-  
+function BalanceCard({ title, amount, color = "balance" }) {
   // Форматирование суммы с разделителями тысяч
-  const formattedAmount = new Intl.NumberFormat('ru-RU', {
-    style: 'currency',
-    currency: 'RUB',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(displayAmount);
+  const formattedAmount = new Intl.NumberFormat("ru-RU").format(amount ?? 0);
 
-  // Определяем CSS-класс на основе типа
-  const cardClass = `${styles.card} ${styles[type] || styles.balance}`;
+  // Выбор класса в зависимости от типа карточки
+  const colorClass =
+    color === "income"
+      ? styles.cardIncome
+      : color === "expense"
+        ? styles.cardExpense
+        : styles.cardBalance;
 
   return (
-    <div className={cardClass}>
-      {/* Подпись карточки */}
-      <div className={styles.title}>{title}</div>
-      
-      {/* Сумма */}
-      <div className={styles.amount}>{formattedAmount}</div>
+    <div className={`${styles.card} ${colorClass}`}>
+      <p className={styles.title}>{title}</p>
+      <p className={styles.amount}>{formattedAmount} ₽</p>
     </div>
   );
 }

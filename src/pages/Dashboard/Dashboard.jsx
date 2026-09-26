@@ -1,104 +1,93 @@
-// src/pages/Dashboard/Dashboard.jsx
-import styles from './Dashboard.module.css';
-
-// Временная inline-заглушка для BalanceCard (будет заменена в шаге D2)
-const BalanceCard = ({ title, amount, color }) => (
-  <div
-    style={{
-      backgroundColor: 'var(--color-surface)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--spacing-lg)',
-      boxShadow: 'var(--shadow-sm)',
-      borderLeft: `4px solid ${color || 'var(--color-primary)'}`,
-    }}
-  >
-    <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--spacing-xs)' }}>
-      {title}
-    </div>
-    <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 700, color: color || 'var(--color-text)' }}>
-      {amount ?? 0} ₽
-    </div>
-  </div>
-);
-
-// Временная inline-заглушка для EmptyState (будет заменена в шаге D6)
-const EmptyState = ({ title, description, actionLabel, onAction }) => (
-  <div
-    style={{
-      textAlign: 'center',
-      padding: 'var(--spacing-2xl) var(--spacing-lg)',
-      color: 'var(--color-text-secondary)',
-    }}
-  >
-    <div style={{ fontSize: '48px', marginBottom: 'var(--spacing-md)' }}>📭</div>
-    <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600, marginBottom: 'var(--spacing-sm)', color: 'var(--color-text)' }}>
-      {title}
-    </div>
-    <div style={{ marginBottom: 'var(--spacing-lg)' }}>{description}</div>
-    {actionLabel && (
-      <button
-        onClick={onAction}
-        style={{
-          backgroundColor: 'var(--color-primary)',
-          color: 'white',
-          padding: 'var(--spacing-sm) var(--spacing-lg)',
-          borderRadius: 'var(--radius-md)',
-          fontWeight: 500,
-        }}
-      >
-        {actionLabel}
-      </button>
-    )}
-  </div>
-);
+import React, { useState, useMemo } from "react";
+import { useData } from "../../context/DataContext";
+import BalanceCard from "../../components/BalanceCard/BalanceCard";
+import EmptyState from "../../components/EmptyState/EmptyState";
+import TransactionList from "../../components/TransactionList/TransactionList";
+import Modal from "../../components/Modal/Modal";
+import TransactionForm from "../../components/TransactionForm/TransactionForm";
+import styles from "./Dashboard.module.css";
 
 function Dashboard() {
-  // Пока данные не подключены — все суммы равны 0
-  const incomesTotal = 0;
-  const expensesTotal = 0;
-  const balance = incomesTotal - expensesTotal;
-  const recentTransactions = [];
+  const { incomes, expenses, addTransaction, deleteTransaction } = useData();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAddClick = () => {
-    // Модалка будет подключена позже (в Фазе F)
-    console.log('Открыть форму добавления операции');
+  // Вычисляем балансы
+  const { totalIncome, totalExpense, balance } = useMemo(() => {
+    const income = (incomes || []).reduce(
+      (sum, inc) => sum + (inc.amount || 0),
+      0,
+    );
+    const expense = (expenses || []).reduce(
+      (sum, exp) => sum + (exp.amount || 0),
+      0,
+    );
+    return {
+      totalIncome: income,
+      totalExpense: expense,
+      balance: income - expense,
+    };
+  }, [incomes, expenses]);
+
+  // Последние 5 транзакций
+  const recentTransactions = useMemo(() => {
+    const allTransactions = [...(incomes || []), ...(expenses || [])];
+    return allTransactions
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 5);
+  }, [incomes, expenses]);
+
+  // Обработчики модалки
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  // Обработчик добавления транзакции
+  const handleSubmit = (transactionData) => {
+    addTransaction(transactionData);
+    handleCloseModal();
+  };
+
+  // Обработчик удаления транзакции
+  const handleDelete = (id) => {
+    // Находим транзакцию, чтобы определить её тип
+    const transaction = [...(incomes || []), ...(expenses || [])].find(
+      (t) => t.id === id,
+    );
+    if (transaction) {
+      deleteTransaction(id, transaction.type);
+    }
   };
 
   return (
     <div className={styles.dashboard}>
-      {/* Заголовок страницы */}
-      <h1 className={styles.title}>Главная</h1>
-
-      {/* Сетка карточек баланса */}
-      <div className={styles.cardsGrid}>
-        <BalanceCard title="Доходы" amount={incomesTotal} color="var(--color-income)" />
-        <BalanceCard title="Расходы" amount={expensesTotal} color="var(--color-expense)" />
-        <BalanceCard title="Баланс" amount={balance} color="var(--color-balance)" />
+      <div className={styles.header}>
+        <h1 className={styles.title}>Обзор</h1>
+        <button className={styles.addButton} onClick={handleOpenModal}>
+          <span className={styles.addIcon}>+</span>
+          Добавить операцию
+        </button>
       </div>
 
-      {/* Секция последних операций */}
+      <div className={styles.balanceGrid}>
+        <BalanceCard title="Доходы" amount={totalIncome} color="income" />
+        <BalanceCard title="Расходы" amount={totalExpense} color="expense" />
+        <BalanceCard title="Баланс" amount={balance} color="balance" />
+      </div>
+
       <div className={styles.recentSection}>
         <h2 className={styles.sectionTitle}>Последние операции</h2>
-        {(recentTransactions?.length || 0) === 0 ? (
-          <EmptyState
-            title="Нет операций"
-            description="Добавьте первую операцию, чтобы начать учёт финансов"
-            actionLabel="Добавить операцию"
-            onAction={handleAddClick}
-          />
-        ) : (
-          <div>Список операций появится позже</div>
-        )}
+        <TransactionList
+          transactions={recentTransactions}
+          onDelete={handleDelete}
+        />
       </div>
 
-      {/* Плавающая кнопка добавления */}
-      <button
-        className={styles.addButton}
-        onClick={handleAddClick}
-        aria-label="Добавить операцию"
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title="Добавить операцию"
       >
-        +
-      </button>
+        <TransactionForm onSubmit={handleSubmit} onCancel={handleCloseModal} />
+      </Modal>
     </div>
   );
 }

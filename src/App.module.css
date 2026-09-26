@@ -1,9 +1,7 @@
-/* src/App.module.css */
-
-/* Корневой контейнер приложения */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--spacing-lg);
+/* Стили корневого контейнера приложения */
+.app {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  background-color: var(--color-bg);
 }

@@ -1,16 +1,14 @@
-// src/components/Layout/Layout.jsx
-import Header from '../Header/Header';
-import styles from './Layout.module.css';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "../Header/Header";
+import styles from "./Layout.module.css";
 
-function Layout({ children }) {
+function Layout() {
   return (
     <div className={styles.layout}>
-      {/* Шапка с навигацией */}
       <Header />
-      
-      {/* Основной контент страницы */}
       <main className={styles.main}>
-        {children}
+        <Outlet />
       </main>
     </div>
   );

@@ -1,21 +1,23 @@
-// src/App.jsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout/Layout';
-import styles from './App.module.css';
-
-// Временные заглушки для страниц (будут заменены в Фазе C)
-const Dashboard = () => <div className={styles.container}>Страница: Главная</div>;
-const History = () => <div className={styles.container}>Страница: История</div>;
-const Analytics = () => <div className={styles.container}>Страница: Аналитика</div>;
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout/Layout";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import History from "./pages/History/History";
+import Analytics from "./pages/Analytics/Analytics";
+import styles from "./App.module.css";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout><Dashboard /></Layout>} />
-        <Route path="/history" element={<Layout><History /></Layout>} />
-        <Route path="/analytics" element={<Layout><Analytics /></Layout>} />
-      </Routes>
+      <div className={styles.app}>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="history" element={<History />} />
+            <Route path="analytics" element={<Analytics />} />
+          </Route>
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }

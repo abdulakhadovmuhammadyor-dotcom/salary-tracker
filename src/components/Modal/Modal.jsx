@@ -1,51 +1,47 @@
-// src/components/Modal/Modal.jsx
-import { useEffect } from 'react';
-import styles from './Modal.module.css';
+import React, { useEffect } from "react";
+import styles from "./Modal.module.css";
 
 function Modal({ isOpen, onClose, title, children }) {
-  // Закрытие по нажатию Escape
+  // Закрытие по Escape
   useEffect(() => {
     if (!isOpen) return;
 
     const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        onClose?.();
+      if (e.key === "Escape") {
+        onClose();
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+
+    // Блокируем скролл body, когда модалка открыта
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen, onClose]);
 
-  // Если модалка не открыта — не рендерим ничего
-  if (!isOpen) return null;
-
-  // Обработчик клика на overlay (закрытие при клике вне модалки)
+  // Закрытие по клику на overlay
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
-      onClose?.();
+      onClose();
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
-        {/* Заголовок с кнопкой закрытия */}
         <div className={styles.header}>
-          <h2 className={styles.title}>{title || 'Модальное окно'}</h2>
-          <button
-            className={styles.closeButton}
-            onClick={onClose}
-            aria-label="Закрыть"
-          >
-            ✕
+          <h2 className={styles.title}>{title}</h2>
+          <button className={styles.closeButton} onClick={onClose}>
+            ×
           </button>
         </div>
-
-        {/* Контент модалки */}
-        <div className={styles.content}>
-          {children}
-        </div>
+        <div className={styles.content}>{children}</div>
       </div>
     </div>
   );
